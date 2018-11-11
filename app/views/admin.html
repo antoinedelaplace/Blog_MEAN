@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="../lib/angular.min.js"></script>
+    <script src="../../build/main.bundle.js"></script>
+    <script src="../lib/jquery.min.js"></script>
+    <script src="../lib/bootstrap.js"></script>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div ng-app="backoffice">
+    <div ng-controller="HeaderController" id="header">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../../index.html">MeanBlog</a>
+                <div class="nav navbar-nav navbar-right" id="connexionButtons">
+                    <button type="button" class="btn btn-danger" ng-click="deconnexion()">Deconnexion</button>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="container-fluid" id ="onglet">
+        <h4>Gestion</h4>
+        <ul>
+            <li>
+                <a ng-click="gestion = 'article'">Articles</a>
+            </li>
+            <li>
+                <a ng-click="gestion = 'users'">Utilisateurs</a>
+            </li>
+        </ul>
+    </div>
+    <div ng-controller="ArticlesController" id="articles" ng-if="gestion == 'article'">
+        <div class="container">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h1 class="panel-title"><input type="text" class="form-control" placeholder="Titre" ng-model="Titre"></h1>
+                </div>
+                <div class="panel-body">
+                    <textarea style="resize:none;" rows="5" type="text" class="form-control" placeholder="Texte de l'article" ng-model="Contenu"></textarea>
+                </div>
+                <button type="button" class="btn btn-success" ng-click="addArticle(Titre, Contenu)">Valider</button>
+            </div>
+            <div class="panel panel-primary" ng-repeat="article in articles" ng-if="isArticleInPage($index)">
+                <div class="panel-heading">
+                    <h1 class="panel-title"><input type="text" class="form-control"  ng-model="article.articleTitre"></h1>
+                    <h6 class="text-right" id="auteur">écrit par <span ng-bind="article.articleAuteur"></span> le <span ng-bind="article.articleDate | date:'dd-MM-yyyy'"></span></h6>
+                </div>
+                <div class="panel-body">
+                    <textarea style="resize:none;" rows="5" type="text" class="form-control" ng-model="article.articleContenu"></textarea>
+                </div>
+                <button type="button" class="btn btn-warning" ng-click="modifArticle(article._id, article.articleTitre, article.articleContenu)"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button type="button" class="btn btn-danger" ng-click="suppArticle(article._id)" ng-confirm-click="Supprimer l'article ?"><span class="glyphicon glyphicon-trash"></span></button>
+                <div class="panel-footer">
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="comment in article.articleComment" >
+                            <table style="width:100%">
+                                <tr>
+                                    <td style="width:70%">
+                                        <textarea style="resize:none;" rows="3" type="text" class="form-control" ng-model="comment.commentaireContenu"></textarea>
+                                        <span class="badge" ng-bind="comment.commentaireAuteur"></span>
+                                        <span class="glyphicon glyphicon-name"></span>
+                                    </td>
+                                    <td style="width:10%"></td>
+                                    <td style="width:20%">
+                                        <button type="button" class="btn btn-warning" ng-click="modifComment(article._id, comment._id, comment.commentaireContenu)"><span class="glyphicon glyphicon-pencil"></span></button>
+                                        <button type="button" class="btn btn-danger" ng-click="suppComment(article._id, comment._id)"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                </tr>
+                            </table>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <nav ng-controller="PaginationController" id="pagination">
+                <ul class="pagination">
+                    <li>
+                        <a ng-click="previousPage()" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li ng-repeat="numPage in range" ng-class="isActivePage(numPage)"><a ng-click="goToPage(numPage)" ng-bind="numPage"></a></li>
+                    <li>
+                        <a ng-click="nextPage()" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div ng-controller="UserController" id="users" ng-if="gestion == 'users'">
+        <div class="container">
+            <table class="table">
+                <tr>
+                    <td class="align-center">Nom d'utilisateur</td>
+                    <td class="align-center">Email</td>
+                    <td class="align-center">Role</td>
+                    <td></td>
+                </tr>
+                <tr ng-repeat="user in users">
+                    <td class=""><input type="text" class="form-control"  ng-model="user.username"></td>
+                    <td class=""><input type="text" class="form-control"  ng-model="user.email"></td>
+                    <td class="">
+                        <select name="role" class="form-control" id="role"  ng-model="user.role">
+                            <option value="normal">Normal</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </td>
+                    <td><button type="button" class="btn btn-warning" ng-click="modifUser(user._id, user.username, user.email, user.role)"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" class="btn btn-danger" ng-click="suppUser(user._id)"><span class="glyphicon glyphicon-trash"></span></button>
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

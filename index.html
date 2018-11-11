@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="app/lib/angular.min.js"></script>
+    <script src="app/lib/jquery.min.js"></script>
+    <script src="app/lib/bootstrap.js"></script>
+    <script src="build/main.bundle.js"></script>
+    <link rel="stylesheet" type="text/css" href="app/css/bootstrap.css" />
+    <link href="app/css/styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div ng-app="frontend">
+    <div ng-controller="HeaderController" id="header">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">MeanBlog</a>
+                <div class="nav navbar-nav navbar-right" id="connexionButtons">
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#connexionModal">Connexion</button>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#inscriptionModal">Inscription</button>
+                    <button class="btn btn-primary" ng-class="isAdmin()" onclick="location.href = 'app/views/admin.html';">Administration</button>
+                    <button type="button" class="btn btn-danger" ng-class="isAuthenticate()" ng-click="deconnexion()">Deconnexion</button>
+                    <button type="button" class="btn btn-danger" ng-click="estconnecte()">Connecté</button>
+                </div>
+            </div>
+        </nav>
+        <div class="modal fade" id="connexionModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="connexionModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="connexionModalLabel">Connexion</h4>
+                        <img src="app/img/facebook-explode.png" width="35px" heigth="35px"/>
+                        <img src="app/img/twitter-explode.png" width="45px" heigth="45px" />
+                    </div>
+                    <div class="modal-body container-fluid">
+                        <div>
+                            <label for="mail">Email</label>
+                            <input type="text" class="form-control" id="mail" ng-model="mail">
+                        </div>
+                        <div>
+                            <label for="password">Mot de passe</label>
+                            <input type="password" class="form-control" id="password" ng-model="password">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="connexion()">Connexion</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="inscriptionModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="inscriptionModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="inscriptionModalLabel">Inscription</h4>
+                    </div>
+                    <div class="modal-body container-fluid">
+                        <div>
+                            <label for="username">Nom d'utilisateur</label>
+                            <input type="text" class="form-control" id="username" ng-model="username">
+                        </div>
+                        <div>
+                            <label for="new_mail">Email</label>
+                            <input type="text" class="form-control" id="new_mail" ng-model="new_mail">
+                        </div>
+                        <div>
+                            <label for="new_password">Mot de passe</label>
+                            <input type="password" class="form-control" id="new_password" ng-model="new_password">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="inscription()">Inscription</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-controller="ArticlesController" id="articles">
+        <div class="container">
+            <div class="panel panel-primary" ng-repeat="article in articles" ng-if="isArticleInPage($index)">
+                <div class="panel-heading">
+                    <h1 class="panel-title" ng-bind="article.articleTitre"></h1>
+                    <h6 class="text-right" id="auteur">écrit par <span ng-bind="article.articleAuteur"></span> le <span ng-bind="article.articleDate | date:'dd-MM-yyyy'"></span></h6>
+                </div>
+                <div class="panel-body" ng-bind="article.articleContenu">
+
+                </div>
+                <div class="panel-footer">
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="comment in article.articleComment" >
+                                    <span ng-bind="comment.commentaireContenu" >
+                                    </span>
+                            <span class="badge" ng-bind="comment.commentaireAuteur"></span>
+                        </li>
+                    </ul>
+                    <div class="form-inline" ng-class="classe[article._id]">
+                        <input type="text" class="form-control" id="commentaire" placeholder="Commentaire" ng-model="commentaires[article._id]" ng-keyup="CheckRemplissage(article._id)">
+                        <button id="send_commentaire" class="btn btn-success" ng-click="addComment(article._id)">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+            <nav ng-controller="PaginationController" id="pagination">
+                <ul class="pagination">
+                    <li>
+                        <a ng-click="previousPage()" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li ng-repeat="numPage in range" ng-class="isActivePage(numPage)"><a ng-click="goToPage(numPage)" ng-bind="numPage"></a></li>
+                    <li>
+                        <a ng-click="nextPage()" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>
